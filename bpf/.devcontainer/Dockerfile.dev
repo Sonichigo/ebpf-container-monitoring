@@ -1,0 +1,24 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install essential tools
+RUN apt-get update && apt-get install -y \
+    clang llvm gcc make libelf-dev \
+    linux-headers-$(uname -r) \
+    libbpf-dev iproute2 iputils-ping \
+    curl git pkg-config unzip \
+    docker.io \
+    ca-certificates
+
+# Install Go
+RUN curl -OL https://go.dev/dl/go1.20.14.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.20.14.linux-amd64.tar.gz && \
+    rm go1.20.14.linux-amd64.tar.gz
+ENV PATH="/usr/local/go/bin:${PATH}"
+
+# Create non-root user
+RUN useradd -m vscode && echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+USER vscode
+WORKDIR /workspace
